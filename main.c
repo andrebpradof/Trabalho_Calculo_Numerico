@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "matriz_esparsa.h"
+#include "matrizEsparsa.h"
+
+#define tamanho 200
 
 //Função que calcula o módulo de um número (double)
 double modulo(double numero){
@@ -12,7 +14,6 @@ double modulo(double numero){
 
 int main(){
 	//Variáveis que armazenam o tamanho do vetor e o número máximo de iterações
-	int tamanho = 200;
 	int itmax = 2*tamanho;
 
 	//Erro Epsilon = 10^(-10)
