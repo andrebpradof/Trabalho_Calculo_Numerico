@@ -14,11 +14,11 @@ double modulo(double numero){
 }
 
 int main(){
-	//Variáveis que armazenam o tamanho do vetor e o número máximo de iterações
+	// ariáveis que armazenam o tamanho do vetor e o número máximo de iterações
 	int itmax = 2*tamanho;
 
 	//Erro Epsilon = 10^(-10)
-	double e = 0.0000000001;
+	double e = pow(10,-10);
 
 	MATRIZ_ESPARSA *matriz;
 	//Cria a matriz utilizando a função feita na biblioteca matriz_esparsa.c

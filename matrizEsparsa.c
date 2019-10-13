@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "matriz_esparsa.h"
+#include "matrizEsparsa.h"
 
 struct celula{
     // "coordenadas" da célula (linha e coluna da matriz)
