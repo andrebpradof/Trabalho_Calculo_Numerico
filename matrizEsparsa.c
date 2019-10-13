@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct stCelula celula;
+typedef struct stMatrizEsparsa matrizEsparsa;
 struct stCelula{
 
     // valor armazenado na célula
@@ -15,6 +17,7 @@ struct stCelula{
     celula *celula_direita; 
 };
 
+
 struct stMatrizEsparsa {
     // ponteiros para os vetores de ponteiros de celulas
     celula **linha;
@@ -25,24 +28,20 @@ struct stMatrizEsparsa {
     int numColuna;
 };
 
-typedef struct stCelula celula;
-
-typedef struct stMatrizEsparsa matrizEsparsa;
-
 double pegarMatriz(matrizEsparsa *matriz, int linha, int coluna){
     linha-= 1;
     coluna-= 1;
 
-    if ( (linha < matriz->numLinha) && (linha >= 0) && (coluna < matriz->numColuna) && (coluna >=0) ){ // Verifica se a posição dada não é inválida
-        celula *auxCelula = matriz->linha[linha]; // ponteiro auxiliar que recebe o endereço do nó cabeça
+    if ( (linha < matriz->numLinha) && (linha >= 0) && (coluna < matriz->numColuna) && (coluna >=0) ){ // Verifica a validade da posição enviada
+        celula *auxCelula = matriz->linha[linha]; // ponteiro para que o nó da cabeça não se perca
 
-        while ( auxCelula->celula_direita != NULL && auxCelula->celula_direita->coluna <= coluna)
-            auxCelula = auxCelula->celula_direita;
+        while (auxCelula->celula_direita != NULL && auxCelula->celula_direita->coluna <= coluna) //Busca onde deve inserir o novo nó
+            auxCelula = auxCelula->celula_direita; //Percorrendo a lista
 
-        if (auxCelula->coluna == coluna)
-            return auxCelula->valor;        
+        if (auxCelula->coluna == coluna) // Se encontrar
+            return auxCelula->valor; // Retorna o valor encontrado        
     }
-    return 0;
+    return 0; // Se não encontrar, retorna zero
 }
 
 
