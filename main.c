@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "matrizEsparsa.h"
+#include <math.h>
+#include "matrizEsparsa.c"
 
 //Hello Plank
 #define tamanho 200
@@ -18,16 +19,16 @@ int main(){
 	int itmax = 2*tamanho;
 
 	//Erro Epsilon = 10^(-10)
-	double e = pow(10,-10);
+	double e = 0.0000000001;
 
-	MATRIZ_ESPARSA *matriz;
+	matrizEsparsa *matriz;
 	//Cria a matriz utilizando a função feita na biblioteca matriz_esparsa.c
 	matriz = criar_matriz(tamanho,tamanho);
 
 	int i;
 	//Seta a matriz como indicado no enunciado
 	for(i=1; i<= tamanho; i++){
-		set_matriz(matriz,i,i,4.5);
+		set_matriz(matriz,i,i,5);
 		set_matriz(matriz,i,i+1,-1);
 		set_matriz(matriz,i+1,i,-1);
 		set_matriz(matriz,i,i+3,-1);
@@ -48,7 +49,7 @@ int main(){
 	for(int l = 0; l < tamanho; l++){
 		vetor_x[l] = 0.0;
 	}
-	//Inicializa variáveis  e vetor auxiliares
+	//Inicializa variáveis e vetor auxiliares
 	int j;
 	int k = 0;
 	double erro = 10; //Erro começa com 10 (núemro qualquer maior que zero)para a primeira iteração do while

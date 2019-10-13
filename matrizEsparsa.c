@@ -1,84 +1,86 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "matrizEsparsa.h"
 
-struct celula{
-    // "coordenadas" da célula (linha e coluna da matriz)
-    int linha;
-    int coluna;
+struct stCelula{
 
     // valor armazenado na célula
     float valor;
 
+    // "coordenadas" da célula (linha e coluna da matriz)
+    int linha;
+    int coluna;
+
     // ponteiros para as céulas a direita e a abaixo
-    CELULA *cel_direita; 
-    CELULA *cel_abaixo;
+    celula *celula_abaixo;
+    celula *celula_direita; 
 };
 
-struct matriz_esparsa {
+struct stMatrizEsparsa {
     // ponteiros para os vetores de ponteiros de celulas
-    CELULA **linha;
-    CELULA **coluna;
+    celula **linha;
+    celula **coluna;
     
     // número de linhas e colunas
-    int nL;
-    int nC;
+    int numLinha;
+    int numColuna;
 };
 
-MATRIZ_ESPARSA *criar_matriz (int n_linhas, int n_colunas){
-    MATRIZ_ESPARSA *matriz_criada = (MATRIZ_ESPARSA *) malloc(sizeof(MATRIZ_ESPARSA));
+typedef struct stCelula celula;
 
-    matriz_criada->nL = n_linhas;
-    matriz_criada->nC = n_colunas;
-    matriz_criada->linha = (CELULA **) malloc ( (sizeof (CELULA *)) * n_linhas); // array de ponteiros para célula para as linhas
-    matriz_criada->coluna = (CELULA **) malloc ( (sizeof (CELULA *)) * n_colunas); // array de ponteiros para célula para as colunas
+typedef struct stMatrizEsparsa matrizEsparsa;
 
-    int aux;
-    for (aux=0; aux < n_linhas; aux++){
-        matriz_criada->linha[aux] = (CELULA *) malloc (sizeof(CELULA));
-        matriz_criada->linha[aux]->cel_direita = NULL;
-    }for (aux=0; aux < n_colunas; aux++){
-        matriz_criada->coluna[aux] = (CELULA *) malloc (sizeof(CELULA));
-        matriz_criada->coluna[aux]->cel_abaixo = NULL;
+double pegarMatriz(matrizEsparsa *matriz, int linha, int coluna){
+    linha-= 1;
+    coluna-= 1;
+
+    if ( (linha < matriz->numLinha) && (linha >= 0) && (coluna < matriz->numColuna) && (coluna >=0) ){ // Verifica se a posição dada não é inválida
+        celula *auxCelula = matriz->linha[linha]; // ponteiro auxiliar que recebe o endereço do nó cabeça
+
+        while ( auxCelula->celula_direita != NULL && auxCelula->celula_direita->coluna <= coluna)
+            auxCelula = auxCelula->celula_direita;
+
+        if (auxCelula->coluna == coluna)
+            return auxCelula->valor;        
     }
-
-    return matriz_criada;
+    return 0;
 }
 
-int set_matriz (MATRIZ_ESPARSA *matriz, int linha_set, int coluna_set, double valor_set){
-    // Matrizes em C consideram o 0 como a primeira linha e coluna, mas para melhor interpretação do usuário, a linha e a coluna começarão em 1
-    --linha_set;
-    --coluna_set;
 
-    if ( (linha_set < matriz->nL) && (linha_set >= 0) && (coluna_set < matriz->nC) && (coluna_set >=0) ){ // Verifica se a posição dada não é inválida
+
+int addMatriz (matrizEsparsa *matriz, int linha, int coluna, double valor){
+    // Matrizes em C consideram o 0 como a primeira linha e coluna, mas para melhor interpretação do usuário, a linha e a coluna começarão em 1
+    linha -= 1;
+    coluna -= 1;
+
+    if ( (linha < matriz->numLinha) && (linha >= 0) && (coluna < matriz->numColuna) && (coluna >=0) ){ // Verifica se a posição dada não é inválida
     
         // Celula a ser inserida
-        CELULA *celula_set = (CELULA *) malloc (sizeof(CELULA));
-        celula_set->linha=linha_set;
-        celula_set->coluna=coluna_set;
-        celula_set->valor=valor_set;
+        celula *celula_set = (celula *) malloc (sizeof(celula));
+        celula_set->linha=linha;
+        celula_set->coluna=coluna;
+        celula_set->valor=valor;
 
-        CELULA *p_aux = matriz->linha[linha_set]; // ponteiro auxiliar para manipulação da matriz
-        while ( (p_aux->cel_direita != NULL) && (p_aux->cel_direita->coluna < coluna_set) ){
-            p_aux = p_aux->cel_direita; // se não estiver vazia, procura a posição onde a célula deve ser inserida                
-        }if (p_aux->cel_direita == NULL){
-            celula_set->cel_direita = NULL; 
-            p_aux->cel_direita = celula_set;
+        celula *aux = matriz->linha[linha]; // ponteiro auxiliar para manipulação da matriz
+        while ( (aux->celula_direita != NULL) && (aux->celula_direita->coluna < coluna) ){
+            aux = aux->celula_direita; // se não estiver vazia, procura a posição onde a célula deve ser inserida                
+        }if (aux->celula_direita == NULL){
+            celula_set->celula_direita = NULL; 
+            aux->celula_direita = celula_set;
         }else{
-            celula_set->cel_direita = p_aux->cel_direita; 
-            p_aux->cel_direita = celula_set;
+            celula_set->celula_direita = aux->celula_direita; 
+            aux->celula_direita = celula_set;
         }
             
 
-        p_aux = matriz->coluna[coluna_set];
-        while ( (p_aux->cel_abaixo != NULL) && (p_aux->cel_abaixo->linha < linha_set) ){
-            p_aux = p_aux->cel_abaixo; // se não estiver vazia, procura a posição onde a célula deve ser inserida                
-        }if (p_aux->cel_abaixo == NULL){
-            celula_set->cel_abaixo = NULL; 
-            p_aux->cel_abaixo = celula_set;
+        aux = matriz->coluna[coluna];
+        while ( (aux->celula_abaixo != NULL) && (aux->celula_abaixo->linha < linha) ){
+            aux = aux->celula_abaixo; // se não estiver vazia, procura a posição onde a célula deve ser inserida                
+        }if (aux->celula_abaixo == NULL){
+            celula_set->celula_abaixo = NULL; 
+            aux->celula_abaixo = celula_set;
         }else{
-            celula_set->cel_abaixo = p_aux->cel_abaixo; 
-            p_aux->cel_abaixo = celula_set;
+            celula_set->celula_abaixo = aux->celula_abaixo; 
+            aux->celula_abaixo = celula_set;
         }
 
         return 1;
@@ -86,26 +88,30 @@ int set_matriz (MATRIZ_ESPARSA *matriz, int linha_set, int coluna_set, double va
     return 0;
 }
 
-double get_matriz(MATRIZ_ESPARSA *matriz, int linha_get, int coluna_get){
-    --linha_get;
-    --coluna_get;
+matrizEsparsa *gerarMatriz (int numLinhas, int numColunas){
+    matrizEsparsa *matriz = (matrizEsparsa *) malloc(sizeof(matrizEsparsa));
 
-    if ( (linha_get < matriz->nL) && (linha_get >= 0) && (coluna_get < matriz->nC) && (coluna_get >=0) ){ // Verifica se a posição dada não é inválida
-        CELULA *celula_get = matriz->linha[linha_get]; // ponteiro auxiliar que recebe o endereço do nó cabeça
+    matriz->numLinha = numLinhas;
+    matriz->numColuna = numColunas;
+    matriz->linha = (celula **) malloc ( (sizeof (celula *)) * numLinhas); // array de ponteiros para célula para as linhas
+    matriz->coluna = (celula **) malloc ( (sizeof (celula *)) * numColunas); // array de ponteiros para célula para as colunas
 
-        while ( celula_get->cel_direita != NULL && celula_get->cel_direita->coluna <= coluna_get)
-            celula_get = celula_get->cel_direita;
-
-        if (celula_get->coluna == coluna_get)
-            return celula_get->valor;        
+    for (int cont=  0; cont < numLinhas; cont++){
+        matriz->linha[cont] = (celula *) malloc (sizeof(celula));
+        matriz->linha[cont]->celula_direita = NULL;
     }
-    return 0;
+    for (int cont = 0; cont < numColunas; cont++){
+        matriz->coluna[cont] = (celula *) malloc (sizeof(celula));
+        matriz->coluna[cont]->celula_abaixo = NULL;
+    }
+
+    return matriz;
 }
 
-void print_matriz(MATRIZ_ESPARSA  *matriz){
-    int i, j;
-    for (j=1; j<=matriz->nL; j++){
-        for (i=1; i<=matriz->nC; i++){
+
+void print_matriz(matrizEsparsa *matriz){
+    for (int j = 1; j<=matriz->numLinha; j++){
+        for (int i = 1; i<=matriz->numColuna; i++){
             printf("%.2lf  ", get_matriz(matriz,j,i));
         }
         printf("\n");
