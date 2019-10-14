@@ -2,16 +2,12 @@
 
     #define MATRIZ_ESPARSA_H
 
-    typedef struct stCelula celula;
-
+    typedef struct stElemento elemento;
     typedef struct stMatrizEsparsa matrizEsparsa;
 
     matrizEsparsa *gerarMatriz (int , int );
-
-    int addMatriz(matrizEsparsa *, int , int , double );
-
-    double pegarMmatriz(matrizEsparsa *, int , int );
-
+    int addElemento(matrizEsparsa *, int , int , double );
+    double pegarElemento(matrizEsparsa *, int , int );
     void imprimirMatriz(matrizEsparsa  *);
 
 #endif

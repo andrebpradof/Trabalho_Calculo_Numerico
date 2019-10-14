@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "matrizEsparsa.h" 
 
-typedef struct stElemento elemento;
-typedef struct stMatrizEsparsa matrizEsparsa;
 struct stElemento{
 
     // valor armazenado na célula
@@ -111,7 +110,7 @@ matrizEsparsa *gerarMatriz (int numLinhas, int numColunas){
 void imprimirMatriz(matrizEsparsa *matriz){
     for (int j = 1; j<=matriz->numLinha; j++){
         for (int i = 1; i<=matriz->numColuna; i++){
-            printf("%.2lf  ", get_matriz(matriz,j,i));
+            printf("%.2lf  ", pegarElemento(matriz,j,i));
         }
         printf("\n");
     }
